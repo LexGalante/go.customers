@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -52,15 +53,15 @@ func GetCustomers(w http.ResponseWriter, r *http.Request) {
 //GetCustomerByID -> retrieve a single customer by id
 func GetCustomerByID(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id, err := strconv.ParseUint(params["id"], 10, 64)
+	idCustomer, err := strconv.ParseUint(params["id_customer"], 10, 64)
 	if err != nil {
-		BadRequest(w, r, models.MakeInvalidParameterError("id"))
+		BadRequest(w, r, models.MakeInvalidParameterError("id_customer"))
 		return
 	}
 
 	customer := entities.Customer{}
 	db := infrastructures.GetDatabaseConnection()
-	if result := db.Preload("Addresses").Preload("Emails").Preload("Phones").First(&customer, id); result.Error != nil {
+	if result := db.Preload("Addresses").Preload("Emails").Preload("Phones").First(&customer, idCustomer); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			NotFound(w, r, models.MakeNotFoundError("customer"))
 			return
@@ -83,11 +84,18 @@ func CreateCustomer(w http.ResponseWriter, r *http.Request) {
 
 	db := infrastructures.GetDatabaseConnection()
 
-	validations, err := customer.Validate(db)
+	validations, err := customer.Validate()
 	if err != nil {
 		InternalServerError(w, r, models.MakeUnexpectedError())
 		return
 	}
+
+	var customerExist entities.Customer
+	db.Select("login").Where("login = ?", customer.Login).Limit(1).Find(&customerExist)
+	if customerExist.Login != "" {
+		validations["LOGIN_ALREADY_EXIST"] = fmt.Sprintf("login %s already exists", customerExist.Login)
+	}
+
 	if len(validations) > 0 {
 		UnprocessableEntity(w, r, validations)
 		return
@@ -108,9 +116,9 @@ func CreateCustomer(w http.ResponseWriter, r *http.Request) {
 //UpdateCustomer -> apply changes at single customer
 func UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id, err := strconv.ParseUint(params["id"], 10, 64)
+	idCustomer, err := strconv.ParseUint(params["id_customer"], 10, 64)
 	if err != nil {
-		BadRequest(w, r, models.MakeInvalidParameterError("id"))
+		BadRequest(w, r, models.MakeInvalidParameterError("id_customer"))
 		return
 	}
 
@@ -124,10 +132,10 @@ func UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 	db := infrastructures.GetDatabaseConnection()
 
 	if customer.ID == 0 {
-		customer.ID = id
+		customer.ID = idCustomer
 	}
 
-	validations, err := customer.Validate(db)
+	validations, err := customer.Validate()
 	if err != nil {
 		InternalServerError(w, r, models.MakeUnexpectedError())
 		return
@@ -138,7 +146,7 @@ func UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dbCustomer := entities.Customer{}
-	if result := db.First(&dbCustomer, id); result.Error != nil {
+	if result := db.First(&dbCustomer, idCustomer); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			NotFound(w, r, models.MakeNotFoundError("customer"))
 			return
@@ -164,14 +172,14 @@ func UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 //DeleteCustomer -> delete customer by id
 func DeleteCustomer(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id, err := strconv.ParseUint(params["id"], 10, 64)
+	idCustomer, err := strconv.ParseUint(params["id_customer"], 10, 64)
 	if err != nil {
-		BadRequest(w, r, models.MakeInvalidParameterError("id"))
+		BadRequest(w, r, models.MakeInvalidParameterError("id_customer"))
 		return
 	}
 
 	db := infrastructures.GetDatabaseConnection()
-	if result := db.Delete(&entities.Customer{}, id); result.Error != nil {
+	if result := db.Delete(&entities.Customer{}, idCustomer); result.Error != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			NotFound(w, r, models.MakeNotFoundError("customer"))
 			return

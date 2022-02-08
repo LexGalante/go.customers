@@ -2,13 +2,55 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"runtime"
 
+	"github.com/lexgalante/go.customers/entities"
+	"github.com/lexgalante/go.customers/infrastructures"
 	"github.com/lexgalante/go.customers/models"
+	"gorm.io/gorm"
 )
+
+//Create -> generic create resource
+func Create(w http.ResponseWriter, r *http.Request, e entities.Entity) {
+	db := infrastructures.GetDatabaseConnection()
+
+	validations, err := e.Validate()
+	if err != nil {
+		InternalServerError(w, r, models.MakeUnexpectedError())
+		return
+	}
+	if len(validations) > 0 {
+		UnprocessableEntity(w, r, validations)
+		return
+	}
+
+	result := db.Create(e)
+	if result.Error != nil {
+		InternalServerError(w, r, models.MakeUnexpectedWithBodyError(result.Error.Error()))
+		return
+	}
+
+	Created(w, r, e)
+}
+
+//Delete -> generic delete resource
+func Delete(w http.ResponseWriter, r *http.Request, e entities.Entity, id int) {
+	db := infrastructures.GetDatabaseConnection()
+	if result := db.Delete(&e, id); result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			NotFound(w, r, models.MakeNotFoundError(e.Name()))
+			return
+		}
+		InternalServerError(w, r, models.MakeUnexpectedError())
+		return
+	}
+
+	NoContent(w, r)
+}
 
 //Ok -> 200
 func Ok(w http.ResponseWriter, r *http.Request, v interface{}) {
@@ -42,6 +84,18 @@ func BadRequest(w http.ResponseWriter, r *http.Request, m models.Error) {
 	}
 
 	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(m)
+}
+
+//Unauthorized -> 401
+func Unauthorized(w http.ResponseWriter, r *http.Request, m models.Error) {
+	pc, _, _, ok := runtime.Caller(1)
+	details := runtime.FuncForPC(pc)
+	if ok && details != nil {
+		log.Println(fmt.Sprintf("[%s] - raise a unathorized: %s", details.Name(), m))
+	}
+
+	w.WriteHeader(http.StatusUnauthorized)
 	json.NewEncoder(w).Encode(m)
 }
 

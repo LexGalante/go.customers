@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -13,7 +14,7 @@ import (
 //GetAddresses -> get customers addresses
 func GetAddresses(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id, err := strconv.ParseUint(params["id"], 10, 64)
+	idCustomer, err := strconv.ParseUint(params["id_customer"], 10, 64)
 	if err != nil {
 		BadRequest(w, r, models.MakeInvalidParameterError("id"))
 		return
@@ -22,7 +23,7 @@ func GetAddresses(w http.ResponseWriter, r *http.Request) {
 	var addresses []entities.Address
 
 	db := infrastructures.GetDatabaseConnection()
-	if result := db.Where("customer_id = ?", id).Find(&addresses); result.Error != nil {
+	if result := db.Where("customer_id = ?", idCustomer).Find(&addresses); result.Error != nil {
 		InternalServerError(w, r, models.MakeUnexpectedError())
 		return
 	}
@@ -33,4 +34,48 @@ func GetAddresses(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Ok(w, r, addresses)
+}
+
+//CreateAddress -> add new address into a customer
+func CreateAddress(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	idCustomer, err := strconv.ParseUint(params["id_customer"], 10, 64)
+	if err != nil {
+		BadRequest(w, r, models.MakeInvalidParameterError("id_customer"))
+		return
+	}
+
+	var address entities.Address
+	err = json.NewDecoder(r.Body).Decode(&address)
+	if err != nil {
+		InternalServerError(w, r, models.MakeInvalidJSONBodyError())
+		return
+	}
+
+	address.CustomerID = idCustomer
+
+	if address.PostalCode != "" {
+		viaCepAddress, err := infrastructures.GetAddresFromViaCep(address.PostalCode)
+		if err != nil {
+			InternalServerError(w, r, models.MakeUnexpectedWithBodyError("cannot retrieve address from via cep"))
+		} else {
+			address.StreetName = viaCepAddress.StreetName
+			address.District = viaCepAddress.District
+			address.City = viaCepAddress.City
+		}
+	}
+
+	Create(w, r, &address)
+}
+
+//DeleteAddress -> change new address into a customer
+func DeleteAddress(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	idAddress, err := strconv.ParseUint(params["id_address"], 10, 64)
+	if err != nil {
+		BadRequest(w, r, models.MakeInvalidParameterError("id_address"))
+		return
+	}
+
+	Delete(w, r, &entities.Address{}, int(idAddress))
 }

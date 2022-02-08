@@ -18,6 +18,16 @@ func MakeNotFoundError(resourceName string) Error {
 	return e
 }
 
+//MakeUnauthorizedError -> when entity not found
+func MakeUnauthorizedError() Error {
+	e := Error{
+		Code:    "UNAUTHORIZED",
+		Message: "unrecognized user/password",
+	}
+
+	return e
+}
+
 //MakeInvalidParameterError -> when url parameter is invalid
 func MakeInvalidParameterError(parameterName string) Error {
 	e := Error{
