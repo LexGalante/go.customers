@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/lexgalante/go.customers/entities"
-	"github.com/lexgalante/go.customers/infrastructures"
-	"github.com/lexgalante/go.customers/models"
+	"github.com/lexgalante/go.customers/src/entities"
+	"github.com/lexgalante/go.customers/src/infrastructures"
+	"github.com/lexgalante/go.customers/src/models"
 	"gorm.io/gorm"
 )
 
@@ -79,5 +79,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Ok(w, r, models.AuthToken{AccessToken: accessToken, ExpiresAt: expiresAt})
+	Ok(w, r, models.AuthToken{TokenType: "Bearer ", AccessToken: accessToken, ExpiresAt: expiresAt})
 }

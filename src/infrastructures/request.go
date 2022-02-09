@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/lexgalante/go.customers/models"
+	"github.com/lexgalante/go.customers/src/models"
 )
 
 //GetAddresFromViaCep -> search address in viacep

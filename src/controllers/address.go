@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/lexgalante/go.customers/entities"
-	"github.com/lexgalante/go.customers/infrastructures"
-	"github.com/lexgalante/go.customers/models"
+	"github.com/lexgalante/go.customers/src/entities"
+	"github.com/lexgalante/go.customers/src/infrastructures"
+	"github.com/lexgalante/go.customers/src/models"
 )
 
 //GetAddresses -> get customers addresses

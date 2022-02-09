@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/lexgalante/go.customers/entities"
-	"github.com/lexgalante/go.customers/infrastructures"
-	"github.com/lexgalante/go.customers/models"
+	"github.com/lexgalante/go.customers/src/entities"
+	"github.com/lexgalante/go.customers/src/infrastructures"
+	"github.com/lexgalante/go.customers/src/models"
 	"gorm.io/gorm"
 )
 
@@ -96,6 +96,18 @@ func Unauthorized(w http.ResponseWriter, r *http.Request, m models.Error) {
 	}
 
 	w.WriteHeader(http.StatusUnauthorized)
+	json.NewEncoder(w).Encode(m)
+}
+
+//Forbidden -> 403
+func Forbidden(w http.ResponseWriter, r *http.Request, m models.Error) {
+	pc, _, _, ok := runtime.Caller(1)
+	details := runtime.FuncForPC(pc)
+	if ok && details != nil {
+		log.Println(fmt.Sprintf("[%s] - raise a forbidden: %s", details.Name(), m))
+	}
+
+	w.WriteHeader(http.StatusForbidden)
 	json.NewEncoder(w).Encode(m)
 }
 

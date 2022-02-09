@@ -4,7 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/lexgalante/go.customers/controllers"
+	"github.com/lexgalante/go.customers/src/controllers"
+	"github.com/lexgalante/go.customers/src/middlewares"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -13,16 +14,17 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		panic("Unable to load .env file")
+		panic("unable to load .env file")
 	}
 
-	router := prepareRouterHandler()
+	router := mux.NewRouter()
+	addHandlers(router)
+	addMiddlewares(router)
 
 	log.Fatal(http.ListenAndServe(":5000", router))
 }
 
-func prepareRouterHandler() *mux.Router {
-	router := mux.NewRouter()
+func addHandlers(router *mux.Router) {
 	router.HandleFunc("/register", controllers.Register).Methods(http.MethodPost)
 	router.HandleFunc("/login", controllers.Login).Methods(http.MethodPost)
 	subrouter := router.PathPrefix("/v1/").Subrouter()
@@ -43,6 +45,8 @@ func prepareRouterHandler() *mux.Router {
 	subrouter.HandleFunc("/customers/{id_customer:[0-9,]+}/phones", controllers.GetPhones).Methods(http.MethodGet)
 	subrouter.HandleFunc("/customers/{id_customer:[0-9,]+}/phones", controllers.CreatePhone).Methods(http.MethodPost)
 	subrouter.HandleFunc("/customers/{id_customer:[0-9,]+}/phones/{id_phone:[0-9,]+}", controllers.DeletePhone).Methods(http.MethodDelete)
+}
 
-	return router
+func addMiddlewares(router *mux.Router) {
+	router.Use(middlewares.JwtSecurityMiddleware)
 }

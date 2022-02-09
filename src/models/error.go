@@ -28,6 +28,16 @@ func MakeUnauthorizedError() Error {
 	return e
 }
 
+//MakeForbiddenError -> when entity not found
+func MakeForbiddenError() Error {
+	e := Error{
+		Code:    "FORBIDDEN",
+		Message: "you cannot perform this action",
+	}
+
+	return e
+}
+
 //MakeInvalidParameterError -> when url parameter is invalid
 func MakeInvalidParameterError(parameterName string) Error {
 	e := Error{

@@ -1,0 +1,27 @@
+version: '3.2'
+
+services:
+  go_customers_postgres:
+    image: postgres
+    container_name: go_customers_postgres    
+    ports:
+      - 5432:5432
+    networks:
+      - go_customers_network
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+
+  go_customers_rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: go_customers_rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - go_customers_network
+
+networks:
+  go_customers_network:
+    driver: bridge

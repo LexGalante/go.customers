@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lexgalante/go.customers/entities"
-	"github.com/lexgalante/go.customers/infrastructures"
-	"github.com/lexgalante/go.customers/models"
+	"github.com/lexgalante/go.customers/src/entities"
+	"github.com/lexgalante/go.customers/src/infrastructures"
+	"github.com/lexgalante/go.customers/src/models"
 	"gorm.io/gorm"
 
 	"github.com/gorilla/mux"

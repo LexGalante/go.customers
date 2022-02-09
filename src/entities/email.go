@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"github.com/lexgalante/go.customers/utils"
+	"github.com/lexgalante/go.customers/src/utils"
 )
 
 //Email -> Represent a entity customer_email
