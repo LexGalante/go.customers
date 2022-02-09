@@ -16,7 +16,10 @@ import (
 func JwtSecurityMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//when route is /register or /login the middleware cannot execute
-		if r.URL.Path != "/register" && r.URL.Path != "/login" {
+		if r.URL.Path == "/register" || r.URL.Path == "/login" {
+			//call next handler
+			next.ServeHTTP(w, r)
+		} else {
 			accessToken := r.Header.Get("Authorization")
 			accessToken = strings.ReplaceAll(accessToken, "Bearer ", "")
 
@@ -39,8 +42,6 @@ func JwtSecurityMiddleware(next http.Handler) http.Handler {
 				return
 			}
 		}
-		//call next handler
-		next.ServeHTTP(w, r)
 	})
 }
 

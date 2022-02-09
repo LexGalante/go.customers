@@ -49,4 +49,5 @@ func addHandlers(router *mux.Router) {
 
 func addMiddlewares(router *mux.Router) {
 	router.Use(middlewares.JwtSecurityMiddleware)
+	router.Use(mux.CORSMethodMiddleware(router))
 }

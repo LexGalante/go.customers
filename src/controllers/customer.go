@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -111,6 +112,8 @@ func CreateCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Created(w, r, customer)
+
+	go sendMessage("new_customers", customer)
 }
 
 //UpdateCustomer -> apply changes at single customer
@@ -167,6 +170,8 @@ func UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Accepted(w, r, customer)
+
+	go sendMessage("changes_customers", customer)
 }
 
 //DeleteCustomer -> delete customer by id
@@ -189,4 +194,18 @@ func DeleteCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	NoContent(w, r)
+}
+
+func sendMessage(exchangeName string, customer entities.Customer) {
+	message, err := json.Marshal(customer)
+	if err != nil {
+		log.Fatalf("unexpected error ocurred while trying to serialize entities.Customer: %s", err.Error())
+		return
+	}
+
+	err = infrastructures.PublishMessage(exchangeName, message)
+	if err != nil {
+		log.Fatalf("unexpected error ocurred while trying to publish message: %s, in exchange: %s", exchangeName, message)
+		return
+	}
 }
