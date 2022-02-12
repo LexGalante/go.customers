@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/lexgalante/go.customers/src/controllers"
-	"github.com/lexgalante/go.customers/src/middlewares"
+	"github.com/lexgalante/go.customers/api/src/controllers"
+	"github.com/lexgalante/go.customers/api/src/middlewares"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"

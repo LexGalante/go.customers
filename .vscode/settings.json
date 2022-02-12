@@ -1,0 +1,21 @@
+{
+    "go.testFlags": [
+      "-failfast",
+      "-v"
+    ],
+    "go.toolsManagement.autoUpdate": true,
+    "gopls": {
+      "ui.semanticTokens": true
+    },
+    "go.lintOnSave": "file",
+    "go.lintTool": "golint", 
+    "go.formatTool": "goimports",
+    "go.useLanguageServer": true,
+    "[go]": {
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+      }
+    },
+    "go.docsTool": "godoc"
+  }

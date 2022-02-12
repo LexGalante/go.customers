@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/lexgalante/go.customers/src/entities"
-	"github.com/lexgalante/go.customers/src/infrastructures"
-	"github.com/lexgalante/go.customers/src/models"
+	"github.com/lexgalante/go.customers/api/src/entities"
+	"github.com/lexgalante/go.customers/api/src/infrastructures"
+	"github.com/lexgalante/go.customers/api/src/models"
 	"gorm.io/gorm"
 )
 

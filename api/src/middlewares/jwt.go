@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/lexgalante/go.customers/src/controllers"
-	"github.com/lexgalante/go.customers/src/infrastructures"
-	"github.com/lexgalante/go.customers/src/models"
+	"github.com/lexgalante/go.customers/api/src/controllers"
+	"github.com/lexgalante/go.customers/api/src/infrastructures"
+	"github.com/lexgalante/go.customers/api/src/models"
 )
 
 //JwtSecurityMiddleware -> authenticathion middleware

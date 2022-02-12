@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/lexgalante/go.customers/src/infrastructures"
-	"github.com/lexgalante/go.customers/src/utils"
+	"github.com/lexgalante/go.customers/api/src/infrastructures"
+	"github.com/lexgalante/go.customers/api/src/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 

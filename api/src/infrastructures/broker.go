@@ -20,7 +20,7 @@ func PublishMessage(exchangeName string, message []byte) error {
 	}
 	defer ch.Close()
 
-	err = ch.Publish(exchangeName, "", false, false, amqp.Publishing{
+	err = ch.Publish(exchangeName, exchangeName, false, false, amqp.Publishing{
 		AppId:       "go.customers",
 		ContentType: "application/json",
 		Body:        message,
